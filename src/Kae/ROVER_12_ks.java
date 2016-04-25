@@ -70,17 +70,16 @@ public class ROVER_12_ks extends ROVER_12 {
 		// ******** Rover logic *********
 		String[] cardinals = { "E", "S", "W", "N" };
 		String line = "";
-		boolean stuck, blocked;
 
 		ArrayList<String> equipment = getEquipment();
 		System.out.println("ROVER_12 equipment list " + equipment + "\n");
 
 		// moveRover12ToAClearArea();
+		setCurrentLoc(currentLoc);
 
 		// ******** Rover motion *********
 		while (true) {
 
-			setCurrentLoc(currentLoc);
 			debugPrint4Dirs(currentLoc);
 
 			// if (previousLoc != null && previousLoc.equals(currentLoc)) {
@@ -103,7 +102,7 @@ public class ROVER_12_ks extends ROVER_12 {
 	}
 
 	private void doThisWhenStuck(Coord currentLoc, MapTile[][] scanMapTiles)
-			throws InterruptedException {
+			throws InterruptedException, IOException {
 
 		String currentDir;
 		getOpenDir(currentLoc);
@@ -171,18 +170,39 @@ public class ROVER_12_ks extends ROVER_12 {
 		return false;
 	}
 
-	private boolean isSand(Coord currentLoc) {
+	private boolean isSand(Coord currentLoc) throws IOException {
+		if (mapJournal[currentLoc.ypos][currentLoc.xpos] == null) {
+			doScan();
+		}
 		return mapJournal[currentLoc.ypos][currentLoc.xpos].getTerrain()
 				.equals(Terrain.SAND);
 	}
 
-	private boolean isSand(int x, int y) {
-		return mapJournal[y][x].getTerrain().equals(Terrain.SAND);
-	}
+	private boolean isSand(int x, int y) throws IOException {
 
-	// KSTD - implement
-	private boolean theQuadrantContainsSand() {
-		return true;
+		// debug
+		System.out.println("current pos under scan: " + currentLoc + "\tx,y = "
+				+ x + "," + y);
+		if (withinTheGrid(x, y, mapJournal.length)) {
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			if (mapJournal[y][x] == null) {
+				doScan();
+				return mapJournal[y][x].getTerrain().equals(Terrain.SAND);
+			} else {
+				System.out.println();
+				System.out.println("isSand(): mapJournal[y][x] = "
+						+ mapJournal[y][x].getTerrain() + "("
+						+ mapJournal[y][x].getScience() + ")");
+				return mapJournal[y][x].getTerrain().equals(Terrain.SAND);
+			}
+		}
+		return false;
 	}
 
 	// **********************************************
@@ -326,8 +346,6 @@ public class ROVER_12_ks extends ROVER_12 {
 			// loc = line.substring(4);
 			currentLoc = (CoordUtil) extractLOC(line);
 		}
-		// DEBUG
-		System.out.println("ROVER_12 currentLoc at start: " + currentLoc);
 	}
 
 	private void snake(String[] cardinals, int scanRange) {
@@ -335,7 +353,8 @@ public class ROVER_12_ks extends ROVER_12 {
 
 	}
 
-	private void sinusoidal(String[] cardinals) throws InterruptedException {
+	private void sinusoidal(String[] cardinals) throws InterruptedException,
+			IOException {
 
 		int waveLength = 3, waveHeight = 6, steps = waveLength;
 		cardinals[0] = "E";
@@ -367,7 +386,7 @@ public class ROVER_12_ks extends ROVER_12 {
 	}
 
 	private void sinusoidal_LR(String[] cardinals, int waveLength,
-			int waveHeight) throws InterruptedException {
+			int waveHeight) throws InterruptedException, IOException {
 		int steps;
 
 		steps = waveLength;
@@ -404,7 +423,7 @@ public class ROVER_12_ks extends ROVER_12 {
 		}
 	}
 
-	private void move(String dir) {
+	private void move(String dir) throws IOException {
 		CoordUtil loc = currentLoc.clone();
 
 		switch (dir) {
@@ -432,38 +451,38 @@ public class ROVER_12_ks extends ROVER_12 {
 
 	private void moveEast() {
 		out.println("MOVE E");
-		System.out.print(currentLoc+" - E -> ");
-		currentLoc.incrementX(currentLoc);
-		System.out.print(currentLoc+"\n");
+		System.out.print(currentLoc + " - E -> ");
+		currentLoc.incrementX();
+		System.out.print(currentLoc + "\n");
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
 	private void moveWest() {
 		out.println("MOVE W");
-		System.out.print(currentLoc+" - W -> ");
-		currentLoc.decrementX(currentLoc);
-		System.out.print(currentLoc+"\n");
+		System.out.print(currentLoc + " - W -> ");
+		currentLoc.decrementX();
+		System.out.print(currentLoc + "\n");
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
 	private void moveNorth() {
 		out.println("MOVE N");
-		System.out.print(currentLoc+" - N -> ");
-		currentLoc.decrementY(currentLoc);
-		System.out.print(currentLoc+"\n");
+		System.out.print(currentLoc + " - N -> ");
+		currentLoc.decrementY();
+		System.out.print(currentLoc + "\n");
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
 	private void moveSouth() {
 		out.println("MOVE S");
-		System.out.print(currentLoc+" - S -> ");
-		currentLoc.incrementY(currentLoc);
-		System.out.print(currentLoc+"\n");
+		System.out.print(currentLoc + " - S -> ");
+		currentLoc.incrementY();
+		System.out.print(currentLoc + "\n");
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
 	private void sinusoidal_RL(String[] cardinals, int waveLength,
-			int waveHeight) throws InterruptedException {
+			int waveHeight) throws InterruptedException, IOException {
 		int steps;
 
 		steps = waveLength;
@@ -488,7 +507,8 @@ public class ROVER_12_ks extends ROVER_12 {
 		}
 	}
 
-	private void random(String[] cardinals) throws InterruptedException {
+	private void random(String[] cardinals) throws InterruptedException,
+			IOException {
 		int rdNum;
 		String currentDir;
 		for (int i = 0; i < 5; i++) {
@@ -502,7 +522,8 @@ public class ROVER_12_ks extends ROVER_12 {
 		}
 	}
 
-	private void moveRover12ToAClearArea() throws InterruptedException {
+	private void moveRover12ToAClearArea() throws InterruptedException,
+			IOException {
 		for (int i = 0; i < 5; i++) {
 			move("E");
 			Thread.sleep(700);
@@ -518,7 +539,7 @@ public class ROVER_12_ks extends ROVER_12 {
 
 	private void clearReadLineBuffer() throws IOException {
 		while (in.ready()) {
-			System.out.println("ROVER_12 clearing readLine()");
+			// System.out.println("ROVER_12 clearing readLine()");
 			String garbage = in.readLine();
 		}
 	}
@@ -548,7 +569,6 @@ public class ROVER_12_ks extends ROVER_12 {
 				// jsonEqListIn);
 				jsonEqList.append(jsonEqListIn);
 				jsonEqList.append("\n");
-				// System.out.println("ROVER_12 doScan() bottom of while");
 			}
 		} else {
 			// in case the server call gives unexpected results
@@ -581,9 +601,8 @@ public class ROVER_12_ks extends ROVER_12 {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		out.println("SCAN");
 
-		String jsonScanMapIn = in.readLine(); // grabs the string that was
-												// returned first
-		System.out.println("DBG jsonScanMapIn 336 = " + jsonScanMapIn);
+		// grabs the string that was returned first
+		String jsonScanMapIn = in.readLine();
 
 		if (jsonScanMapIn == null) {
 			System.out.println("ROVER_12 check connection to server");
@@ -595,45 +614,43 @@ public class ROVER_12_ks extends ROVER_12 {
 
 		if (jsonScanMapIn.startsWith("SCAN")) {
 			while (!(jsonScanMapIn = in.readLine()).equals("SCAN_END")) {
-				// System.out.println("ROVER_12 incomming SCAN result: " +
-				// jsonScanMapIn);
 				jsonScanMap.append(jsonScanMapIn);
 				jsonScanMap.append("\n");
-				System.out.println("ROVER_12 doScan() bottom of while");
 			}
 		} else {
 			// in case the server call gives unexpected results
 			clearReadLineBuffer();
 			return; // server response did not start with "SCAN"
 		}
-		// System.out.println("ROVER_12 finished scan while");
 
 		String jsonScanMapString = jsonScanMap.toString();
 
-		// System.out.println("ROVER_12 convert from json back to ScanMap class");
 		// convert from the json string back to a ScanMap object
 		scanMap = gson.fromJson(jsonScanMapString, ScanMap.class);
-		// MapTile[][] ptrScanMap =
-		// ((ScanMapUtil)scanMap).cloneMapTile(scanMap.getScanMap());
+
+		// set the pointer object to currently scanned ScanMap
 		MapTile[][] ptrScanMap = scanMap.getScanMap();
+
 		Terrain ter;
 		Science sci;
 		int elev;
 		boolean hasR;
+
 		int scanMapHalfSize = (int) Math.floor(ptrScanMap.length / 2.);
+
 		setCurrentLoc(currentLoc);
+
+		// set top left corner of the section of the map on the global map
+		// journal
 		Coord start = new Coord(currentLoc.getXpos() - scanMapHalfSize,
 				currentLoc.getYpos() - scanMapHalfSize);
-		System.out.println("start: " + start);
-		System.out.println("within the grid? "
-				+ withinTheGrid(start.ypos, start.xpos, mapJournal.length));
 
-		System.out.println("ptrScanMap: ");
-		debugPrintMapTileArray(ptrScanMap);
-		// FIXME --- must correctly record scanned area of the map from scanMaps
+		// debug
+		// System.out.println("scanMap: ");
+		// debugPrintMapTileArray(ptrScanMap);
+
+		// FIXME - must correctly record scanned area of the map from scanMaps
 		// to mapJournal
-		System.out.println("what is ptrScanMap? " + ptrScanMap[0][0]);
-
 		for (int i = 0; i < ptrScanMap.length; i++) {
 			for (int j = 0; j < ptrScanMap.length; j++) {
 
@@ -643,20 +660,23 @@ public class ROVER_12_ks extends ROVER_12 {
 					sci = ptrScanMap[i][j].getScience();
 					elev = ptrScanMap[i][j].getElevation();
 					hasR = ptrScanMap[i][j].getHasRover();
-					System.out.print("\tter=" + ter + "\tsci=" + sci
-							+ "\telev=" + elev + "\thasR=" + hasR);
-					System.out.println(" i,j,startY,startX " + i + ", " + j
-							+ ", " + start.ypos + ", " + start.xpos);
-					mapJournal[start.ypos + i][start.xpos + j] = new MapTileUtil(
-							ter, sci, elev, hasR);
+
+					if (mapJournal[start.ypos + i][start.xpos + j] == null) {
+						mapJournal[start.ypos + i][start.xpos + j] = new MapTileUtil(
+								ter, sci, elev, hasR);
+					}
 				}
 			}
 		}
-		// debug
-		System.out.println("current map journal(null? " + (mapJournal == null)
-				+ "):");
 
 		debugPrintMapTileArray(mapJournal);
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public boolean withinTheGrid(int i, int j, int arrayLength) {
@@ -718,8 +738,13 @@ public class ROVER_12_ks extends ROVER_12 {
 		for (int k = 0; k < edgeSize + 2; k++) {
 			System.out.print("--");
 		}
+
 		System.out.print("\n");
+
 		for (int j = 0; j < edgeSize; j++) {
+
+			System.out.print("j=" + j + "\t");
+
 			System.out.print("| ");
 			for (int i = 0; i < edgeSize; i++) {
 				if (mapTileArray[i][j] == null) {

@@ -35,7 +35,7 @@ import enums.Terrain;
  * allowed # request to the server per sec = 500 2 req / sec
  */
 
-public class ROVER_12_Kae {
+public class rv_12_Kae {
 
 	BufferedReader in;
 	PrintWriter out;
@@ -64,7 +64,7 @@ public class ROVER_12_Kae {
 	// se1k1h1mawar1@gmail.com)
 	Deque<String> scienceBag = new ArrayDeque<String>();
 
-	public ROVER_12_Kae() {
+	public rv_12_Kae() {
 		System.out.println("ROVER_12 rover object constructed");
 		rovername = "ROVER_12";
 		SERVER_ADDRESS = "localhost";
@@ -73,7 +73,7 @@ public class ROVER_12_Kae {
 							// will cut connection if it is too small
 	}
 
-	public ROVER_12_Kae(String serverAddress) {
+	public rv_12_Kae(String serverAddress) {
 		System.out.println("ROVER_12 rover object constructed");
 		rovername = "ROVER_12";
 		SERVER_ADDRESS = serverAddress;
@@ -89,7 +89,7 @@ public class ROVER_12_Kae {
 	public void run() throws IOException, InterruptedException {
 
 		int rdNum;
-		String currentDir;
+		// String currentDir;
 
 		// TODO - need to close this socket
 		makeConnAndInitStream();
@@ -123,7 +123,7 @@ public class ROVER_12_Kae {
 			// out.println("MOVE E");
 
 			setCurrentLoc(currentLoc);
-			debugPrint4Dirs(currentLoc);
+			// debugPrint4Dirs(currentLoc);
 
 			// if (previousLoc != null && previousLoc.equals(currentLoc)) {
 			// stuck = true;
@@ -232,7 +232,7 @@ public class ROVER_12_Kae {
 		System.out.println("scan map size ( findBlockedDirs() ): "
 				+ scanMap.getEdgeSize());
 
-		debugPring4Dirs(scanMapTiles, centerIndex);
+		debugPrint4Dirs(scanMapTiles, centerIndex);
 
 		if (scanMapTiles[centerIndex][centerIndex - 1].getHasRover()
 				|| scanMapTiles[centerIndex][centerIndex - 1].getTerrain() == Terrain.ROCK
@@ -275,7 +275,7 @@ public class ROVER_12_Kae {
 		scanMap.debugPrintMap();
 	}
 
-	private void debugPring4Dirs(MapTile[][] scanMapTiles, int centerIndex) {
+	private void debugPrint4Dirs(MapTile[][] scanMapTiles, int centerIndex) {
 		System.out.println("center: "
 				+ scanMapTiles[centerIndex][centerIndex].getHasRover());
 		System.out
@@ -456,12 +456,6 @@ public class ROVER_12_Kae {
 		}
 	}
 
-	private void moveWest() {
-		out.println("MOVE W");
-		currentLoc.decrementX(currentLoc);
-		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
-	}
-
 	private void move(String dir) {
 		switch (dir) {
 		case "E":
@@ -481,21 +475,27 @@ public class ROVER_12_Kae {
 		}
 	}
 
+	private void moveWest() {
+		out.println("MOVE W");
+		currentLoc.decrementX();
+		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
+	}
+
 	private void moveEast() {
 		out.println("MOVE E");
-		currentLoc.incrementX(currentLoc);
+		currentLoc.incrementX();
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
 	private void moveNorth() {
 		out.println("MOVE N");
-		currentLoc.decrementY(currentLoc);
+		currentLoc.decrementY();
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
 	private void moveSouth() {
 		out.println("MOVE S");
-		currentLoc.incrementY(currentLoc);
+		currentLoc.incrementY();
 		footPrints[currentLoc.getY()][currentLoc.getX()] = true;
 	}
 
@@ -668,9 +668,9 @@ public class ROVER_12_Kae {
 
 		System.out.println("ptrScanMap: ");
 		debugPrintMapTileArray(ptrScanMap);
+
 		// FIXME --- must correctly record scanned area of the map from scanMaps
 		// to mapJournal
-		System.out.println("what is ptrScanMap? " + ptrScanMap[0][0]);
 
 		for (int i = 0; i < ptrScanMap.length; i++) {
 			for (int j = 0; j < ptrScanMap.length; j++) {
@@ -681,14 +681,22 @@ public class ROVER_12_Kae {
 					sci = ptrScanMap[i][j].getScience();
 					elev = ptrScanMap[i][j].getElevation();
 					hasR = ptrScanMap[i][j].getHasRover();
-					System.out.print("\tter=" + ter + "\tsci=" + sci
-							+ "\telev=" + elev + "\thasR=" + hasR);
-					System.out.println(" i,j,startY,startX " + i + ", " + j
-							+ ", " + start.ypos + ", " + start.xpos);
-					mapJournal[start.ypos + i][start.xpos + j] = new MapTileUtil(
-							ter, sci, elev, hasR);
+
+					System.out.println("recording map journal i,j -> " + i
+							+ "," + j);
+					if (mapJournal[start.ypos + i][start.xpos + j] == null) {
+						mapJournal[start.ypos + i][start.xpos + j] = new MapTileUtil(
+								ter, sci, elev, hasR);
+					}
 				}
 			}
+		}
+		
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		// debug
 		System.out.println("current map journal(null? " + (mapJournal == null)
@@ -745,7 +753,7 @@ public class ROVER_12_Kae {
 	 * Runs the client
 	 */
 	public static void main(String[] args) throws Exception {
-		ROVER_12_Kae client = new ROVER_12_Kae();
+		rv_12_Kae client = new rv_12_Kae();
 		client.run();
 	}
 
@@ -760,6 +768,7 @@ public class ROVER_12_Kae {
 		for (int j = 0; j < edgeSize; j++) {
 			System.out.print("| ");
 			for (int i = 0; i < edgeSize; i++) {
+
 				if (mapTileArray[i][j] == null) {
 					System.out.print("n");
 				}

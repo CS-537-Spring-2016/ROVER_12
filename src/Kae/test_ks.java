@@ -3,6 +3,8 @@ package Kae;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import common.Coord;
 import common.MapTile;
 import d1.Fruit;
 import enums.Terrain;
@@ -11,7 +13,16 @@ import common.ScanMap;
 
 public class test_ks {
 
+	
 	@Test
+	public void testIncDecXY() {
+		CoordUtil cd = new CoordUtil(3,4);
+		System.out.println(cd);
+		cd.incrementX();
+		System.out.println(cd);
+		
+	}
+	//@Test
 	public void testBooleanDefault() {
 		boolean[][] tf = new boolean[3][3];
 		System.out.println(tf[0][2]);

@@ -3,28 +3,28 @@ package Kae;
 import common.Coord;
 
 public class CoordUtil extends Coord {
-	int x, y;
+	private int x, y;
 
 	public CoordUtil(int x, int y) {
 		super(x, y);
-		this.x = x;
-		this.y = y;
+		this.x = xpos;
+		this.y = ypos;
 	}
 
-	public void incrementX(CoordUtil loc) {
-		loc.x = x++;
+	public void incrementX() {
+		x += 1;
 	}
 
-	public void incrementY(CoordUtil loc) {
-		loc.y = y++;
+	public void incrementY() {
+		y += 1;
 	}
 
-	public void decrementX(CoordUtil loc) {
-		loc.x = x--;
+	public void decrementX() {
+		x -= 1;
 	}
 
-	public void decrementY(CoordUtil loc) {
-		loc.y = y--;
+	public void decrementY() {
+		y -= 1;
 	}
 
 	public int getX() {
@@ -46,8 +46,9 @@ public class CoordUtil extends Coord {
 	public CoordUtil clone() {
 		return new CoordUtil(x, y);
 	}
+
 	@Override
 	public String toString() {
-		return "Coord [xpos=" + x + ", ypos=" + y + "]";
+		return "Coord [x=" + x + ", y=" + y + "]";
 	}
 }
