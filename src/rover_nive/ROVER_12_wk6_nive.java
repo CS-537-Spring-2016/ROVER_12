@@ -41,7 +41,7 @@ public class ROVER_12_wk6_nive {
 			targetLocation = null;
 	Map<Coord, MapTile> mapTileLog = new HashMap<Coord, MapTile>();
 	// MapTile[][] mapTileLog = new MapTile[100][100];
-	public ArrayList<Coord> pathMap = new ArrayList<Coord>();
+	public ArrayList<Coord> roverPath = new ArrayList<Coord>();
 
 	public ROVER_12_wk6_nive() {
 		// constructor
@@ -136,21 +136,19 @@ public class ROVER_12_wk6_nive {
 				setCurrentLoc();
 				previousLoc = currentLoc;
 
-				
-				
 				// ***** do a SCAN ******
 				/*
-				 * G12 - for now, it is set to load in 11 x 11 map from swarmserver, and copy it
-				 * onto our g12 map log, every 4 steps that rover 12 takes. Better ideas on the iteration interval, anyone?
+				 * G12 - for now, it is set to load in 11 x 11 map from
+				 * swarmserver, and copy it onto our g12 map log, every 4 steps
+				 * that rover 12 takes. Better ideas on the iteration interval,
+				 * anyone?
 				 */
 				if ((stepTrack++) % 4 == 0) {
 					loadScanMapFromSwarmServer();
 					scanMap.debugPrintMap();// debug
 					debugPrintMapTileArray(mapTileLog);
 				}
-				
-				
-				
+
 				// ***** MOVING *****
 				// pull the MapTile array out of the ScanMap object
 				MapTile[][] scanMapTiles = scanMap.getScanMap();
@@ -166,16 +164,17 @@ public class ROVER_12_wk6_nive {
 				// stuck = currentLoc.equals(previousLoc);
 
 				// System.out.println("ROVER_12 stuck test " + stuck);
-				//System.out.println("ROVER_12 blocked test " + blocked);
-				//System.out.println(currentLoc);
-				
+				// System.out.println("ROVER_12 blocked test " + blocked);
+				// System.out.println(currentLoc);
+
 				// store rover 12 path for easy return
-				pathMap.add(new Coord(currentLoc.getXpos(), currentLoc
+				roverPath.add(new Coord(currentLoc.getXpos(), currentLoc
 						.getYpos()));
-				
+
 				// this is the Rovers HeartBeat, it regulates how fast the Rover
 				// cycles through the control loop
-				Thread.sleep(sleepTime); // G12 - sleepTime has been reduced to 100. is that alright?
+				Thread.sleep(sleepTime); // G12 - sleepTime has been reduced to
+											// 100. is that alright?
 
 				System.out
 						.println("ROVER_12 ------------ bottom process control --------------");
@@ -889,8 +888,8 @@ public class ROVER_12_wk6_nive {
 						currentLoc.getYpos() - centerIndex + y);
 
 				// debug
-				System.out.println("\noriginal(i,j)=(" + y + "," + x + ")\n" + tempCoord
-						+ tempTile);
+				System.out.println("\noriginal(i,j)=(" + y + "," + x + ")\n"
+						+ tempCoord + tempTile);
 				mapTileLog.put(tempCoord, tempTile);
 
 				System.out.println(tempCoord + " ** copied ** " + tempTile);
@@ -961,11 +960,6 @@ public class ROVER_12_wk6_nive {
 
 	}
 
-	public double stopWatch(){
-		
-		
-		return 0;
-	}
 	public boolean checkSand(String direction) {
 
 		int centerIndex = (scanMap.getEdgeSize() - 1) / 2;
@@ -1018,6 +1012,24 @@ public class ROVER_12_wk6_nive {
 		// } catch(Exception e) {
 		// e.printStackTrace();
 		// }
+	}
+
+	private long startWatch() {
+		return System.currentTimeMillis();
+	}
+
+	private long stopWatch(long start) {
+		return System.currentTimeMillis() - start;
+	}
+
+	private boolean isStack() {
+
+		if (roverPath.get(roverPath.size()).equals(
+				roverPath.get(roverPath.size() - 1))) {
+			return true;
+		}
+		// if there's a repeted patterns in rover's position, it is likely that he's stuck 
+		return false;
 	}
 
 	/**

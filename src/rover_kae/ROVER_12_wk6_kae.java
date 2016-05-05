@@ -15,6 +15,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
@@ -613,14 +614,13 @@ public class ROVER_12_wk6_kae {
 
 		System.out.println("+++++++++++++++ jsonScanMapString +++++++++++++++");
 		System.out.println(jsonScanMapString.toString());
-//		try {
-//			Thread.sleep(10000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		
+		// try {
+		// Thread.sleep(10000);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+
 		// System.out.println("ROVER_12 convert from json back to ScanMap class");
 		// convert from the json string back to a ScanMap object
 		scanMap = gson.fromJson(jsonScanMapString, ScanMap.class);
@@ -828,60 +828,61 @@ public class ROVER_12_wk6_kae {
 		}
 	}
 
-//	public void debugPrintMapTileHashMap(Map<Coord,MapTile> maptiles, int xStart, int yXtart, int edgeSize){
-//	System.out.println("edge size: " + edgeSize);
-//	for (int k = 0; k < edgeSize + 2; k++) {
-//		System.out.print("--");
-//	}
-//
-//	System.out.print("\n");
-//	for (int j = yXtart; j < edgeSize; j++) {
-//		System.out.print("| ");
-//		for (int i = yXtart; i < edgeSize; i++) {
-//			// check and print edge of map has first priority
-//			if (scanArray[i][j].getTerrain().toString().equals("NONE")) {
-//				System.out.print("XX");
-//
-//				// next most important - print terrain and/or science
-//				// locations
-//				// terrain and science
-//			} else if (!(scanArray[i][j].getTerrain().toString()
-//					.equals("SOIL"))
-//					&& !(scanArray[i][j].getScience().toString()
-//							.equals("NONE"))) {
-//				// both terrain and science
-//
-//				System.out.print(scanArray[i][j].getTerrain().toString()
-//						.substring(0, 1)
-//						+ scanArray[i][j].getScience().getSciString());
-//				// just terrain
-//			} else if (!(scanArray[i][j].getTerrain().toString()
-//					.equals("SOIL"))) {
-//				System.out.print(scanArray[i][j].getTerrain().toString()
-//						.substring(0, 1)
-//						+ " ");
-//				// just science
-//			} else if (!(scanArray[i][j].getScience().toString()
-//					.equals("NONE"))) {
-//				System.out.print(" "
-//						+ scanArray[i][j].getScience().getSciString());
-//
-//				// if still empty check for rovers and print them
-//			} else if (scanArray[i][j].getHasRover()) {
-//				System.out.print("[]");
-//
-//				// nothing here so print nothing
-//			} else {
-//				System.out.print("  ");
-//			}
-//		}
-//		System.out.print(" |\n");
-//	}
-//	for (int k = 0; k < edgeSize + 2; k++) {
-//		System.out.print("--");
-//	}
-//	System.out.print("\n");
-//	}
+	// public void debugPrintMapTileHashMap(Map<Coord,MapTile> maptiles, int
+	// xStart, int yXtart, int edgeSize){
+	// System.out.println("edge size: " + edgeSize);
+	// for (int k = 0; k < edgeSize + 2; k++) {
+	// System.out.print("--");
+	// }
+	//
+	// System.out.print("\n");
+	// for (int j = yXtart; j < edgeSize; j++) {
+	// System.out.print("| ");
+	// for (int i = yXtart; i < edgeSize; i++) {
+	// // check and print edge of map has first priority
+	// if (scanArray[i][j].getTerrain().toString().equals("NONE")) {
+	// System.out.print("XX");
+	//
+	// // next most important - print terrain and/or science
+	// // locations
+	// // terrain and science
+	// } else if (!(scanArray[i][j].getTerrain().toString()
+	// .equals("SOIL"))
+	// && !(scanArray[i][j].getScience().toString()
+	// .equals("NONE"))) {
+	// // both terrain and science
+	//
+	// System.out.print(scanArray[i][j].getTerrain().toString()
+	// .substring(0, 1)
+	// + scanArray[i][j].getScience().getSciString());
+	// // just terrain
+	// } else if (!(scanArray[i][j].getTerrain().toString()
+	// .equals("SOIL"))) {
+	// System.out.print(scanArray[i][j].getTerrain().toString()
+	// .substring(0, 1)
+	// + " ");
+	// // just science
+	// } else if (!(scanArray[i][j].getScience().toString()
+	// .equals("NONE"))) {
+	// System.out.print(" "
+	// + scanArray[i][j].getScience().getSciString());
+	//
+	// // if still empty check for rovers and print them
+	// } else if (scanArray[i][j].getHasRover()) {
+	// System.out.print("[]");
+	//
+	// // nothing here so print nothing
+	// } else {
+	// System.out.print("  ");
+	// }
+	// }
+	// System.out.print(" |\n");
+	// }
+	// for (int k = 0; k < edgeSize + 2; k++) {
+	// System.out.print("--");
+	// }
+	// System.out.print("\n");
+	// }
 
 	public void debugPrintMapTileArray(Map<Coord, MapTile> globalMapCopy) {
 
@@ -964,8 +965,7 @@ public class ROVER_12_wk6_kae {
 
 		// debug - print out
 		System.out.println("inside of loadMapTileIntoGlobal()[scanLoc="
-				+ scanLoc + "]:"+"[currLoc="
-				+ currentLoc);
+				+ scanLoc + "]:" + "[currLoc=" + currentLoc);
 		System.out.println("ptrScanMap Size: " + ptrScanMap.length);
 
 		for (int y = 0; y < ptrScanMap.length; y++) {
@@ -988,8 +988,43 @@ public class ROVER_12_wk6_kae {
 				mapTileLog.put(tempCoord, tempTile);
 
 				System.out.println(tempCoord + " *** " + tempTile);
+
+				// ----big map transfer-------------------------------
+				if (mapTileLog.get(tempCoord) == null) {
+					mapTileLog
+							.put(tempCoord, new MapTile(ter, sci, elev, hasR));
+
+					// TODO Implementation need testing
+
+					// Create JSON object
+					JSONObject obj = new JSONObject();
+					obj.put("x:", new Integer(scanLoc.getXpos() - halfTileSize + x));
+					obj.put("y:", new Integer(scanLoc.getYpos() - halfTileSize + y));
+
+					// Check if terrain exist
+					if (!ter.getTerString().isEmpty()) {
+						obj.put("terrain:", new String(ter.getTerString()));
+					} else {
+						obj.put("terrain:", new String(""));
+					}
+					// Check if science exist
+					if (!sci.getSciString().isEmpty()) {
+						obj.put("science:", new String(sci.getSciString()));
+						obj.put("stillExists:", new Boolean(true));
+					} else {
+						obj.put("science:", new String(""));
+						obj.put("stillExists:", new Boolean(false));
+					}
+
+					// Send JSON object to server using HTTP POST method
+					sendJSONToServer(obj, "http://localhost:8080/sensor");
+
+					// -----------------------------------
+
+				}
 			}
 		}
+
 	}
 
 	private void move(String dir) throws IOException {
@@ -1083,30 +1118,27 @@ public class ROVER_12_wk6_kae {
 		return i >= 0 && j >= 0 && i < arrayLength && j < arrayLength;
 	}
 
-	private void SendJsonToServer(JSONObject obj) {
-		HttpClient client = new DefaultHttpClient();
-		HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000);
-		// Timeout Limit
-		HttpResponse response;
-
+	private void sendJSONToServer(JSONObject obj, String URL) {
+		// TODO need testing
 		try {
-			// TODO Update with correct server URL
-			HttpPost post = new HttpPost("OUR SERVER URL");
-			StringEntity se = new StringEntity(obj.toString());
-			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
-					"application/json"));
-			post.setEntity(se);
-			response = client.execute(post);
+			HttpClient client = HttpClientBuilder.create().build();
+			HttpPost post = new HttpPost(URL);
 
-			/* Checking response */
-			if (response != null) {
-				InputStream in = response.getEntity().getContent();
-				// Get the data in the entity
-			}
+			StringEntity se = new StringEntity(obj.toString());
+			post.setHeader("content-type", "application/json");
+			post.setEntity(se);
+
+			HttpResponse response = client.execute(post);
+
+			// Check response
+
+			System.out.println("Response Code : "
+					+ response.getStatusLine().getStatusCode());
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	/**

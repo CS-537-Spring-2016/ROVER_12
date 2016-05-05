@@ -1,7 +1,5 @@
 package rover_kae;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
 
 import org.junit.Test;
