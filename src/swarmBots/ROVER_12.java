@@ -10,14 +10,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//import org.apache.http.HttpResponse;
-//import org.apache.http.client.HttpClient;
-//import org.apache.http.client.methods.HttpPost;
-//import org.apache.http.entity.StringEntity;
-//import org.apache.http.impl.client.DefaultHttpClient;
-//import org.apache.http.message.BasicHeader;
-//import org.apache.http.params.HttpConnectionParams;
-//import org.apache.http.protocol.HTTP;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 
 import com.google.gson.Gson;
@@ -143,23 +140,22 @@ public class ROVER_12 {
 			while (true) {
 
 				setCurrentLoc();
-				previousLoc = currentLoc;
+				previousLoc = currentLoc.clone();
 
-				
-				
 				// ***** do a SCAN ******
 				/*
-				 * G12 - for now, it is set to load in 11 x 11 map from swarmserver, and copy it
-				 * onto our g12 map log, every 4 steps that rover 12 takes. Better ideas on the iteration interval, anyone?
+				 * G12 - for now, it is set to load in 11 x 11 map from
+				 * swarmserver, and copy it onto our g12 map log, every 4 steps
+				 * that rover 12 takes. Better ideas on the iteration interval,
+				 * anyone?
 				 */
 				if ((stepTrack++) % 4 == 0) {
 					loadScanMapFromSwarmServer();
 					scanMap.debugPrintMap();// debug
+					debugPrintMapTileArrayText(mapTileLog, 30);
 					debugPrintMapTileArray(mapTileLog);
 				}
-				
-				
-				
+
 				// ***** MOVING *****
 				// pull the MapTile array out of the ScanMap object
 				MapTile[][] scanMapTiles = scanMap.getScanMap();
@@ -175,16 +171,17 @@ public class ROVER_12 {
 				// stuck = currentLoc.equals(previousLoc);
 
 				// System.out.println("ROVER_12 stuck test " + stuck);
-				//System.out.println("ROVER_12 blocked test " + blocked);
-				//System.out.println(currentLoc);
-				
+				// System.out.println("ROVER_12 blocked test " + blocked);
+				// System.out.println(currentLoc);
+
 				// store rover 12 path for easy return
 				pathMap.add(new Coord(currentLoc.getXpos(), currentLoc
 						.getYpos()));
-				
+
 				// this is the Rovers HeartBeat, it regulates how fast the Rover
 				// cycles through the control loop
-				Thread.sleep(sleepTime); // G12 - sleepTime has been reduced to 100. is that alright?
+				Thread.sleep(sleepTime); // G12 - sleepTime has been reduced to
+											// 100. is that alright?
 
 				System.out
 						.println("ROVER_12 ------------ bottom process control --------------");
@@ -575,6 +572,8 @@ public class ROVER_12 {
 	// array group12 - this raw JsonData should be used for our maptileLog?
 	public void loadScanMapFromSwarmServer() throws IOException {
 		// System.out.println("ROVER_12 method doScan()");
+		setCurrentLoc();
+		Coord scanLoc = new Coord(currentLoc.getXpos(), currentLoc.getYpos());
 		Gson gson = new GsonBuilder().setPrettyPrinting()
 				.enableComplexMapKeySerialization().create();
 		out.println("SCAN");
@@ -609,12 +608,21 @@ public class ROVER_12 {
 		// new MyWriter( jsonScanMapString, 0); //gives a strange result -
 		// prints the \n instead of newline character in the file
 
+		System.out.println("+++++++++++++++ jsonScanMapString +++++++++++++++");
+		System.out.println(jsonScanMapString.toString());
+		// try {
+		// Thread.sleep(10000);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+
 		// System.out.println("ROVER_12 convert from json back to ScanMap class");
 		// convert from the json string back to a ScanMap object
 		scanMap = gson.fromJson(jsonScanMapString, ScanMap.class);
 
 		myJSONStringBackupofMap = jsonScanMapString;
-		loadMapTilesOntoGlobalMapLog(scanMap.getScanMap());
+		loadMapTilesOntoGlobalMapLog(scanMap.getScanMap(), scanLoc);
 	}
 
 	private Coord requestStartLoc(Socket soc) throws IOException {
@@ -804,6 +812,18 @@ public class ROVER_12 {
 		System.out.print("\n");
 	}
 
+	public void debugPrintMapTileArrayText(Map<Coord, MapTile> globalMapCopy,
+			int mapSize) {
+		MapTile tile;
+
+		for (int y = 0; y < mapSize; y++) {
+			for (int x = 0; x < mapSize; x++) {
+				tile = globalMapCopy.get(new Coord(x, y));
+				System.out.print("x,y=" + x + "," + y + "\t" + tile + "\t/t");
+			}
+		}
+	}
+
 	public void debugPrintMapTileArray(Map<Coord, MapTile> globalMapCopy) {
 
 		// FIXME
@@ -872,7 +892,8 @@ public class ROVER_12 {
 		System.out.print("\n");
 	}
 
-	private void loadMapTilesOntoGlobalMapLog(MapTile[][] ptrScanMap) {
+	private void loadMapTilesOntoGlobalMapLog(MapTile[][] ptrScanMap,
+			Coord scanLoc) {
 
 		MapTile tempTile;
 		Coord tempCoord;
@@ -880,31 +901,70 @@ public class ROVER_12 {
 		Science sci;
 		int elev;
 		boolean hasR;
-		int centerIndex = ptrScanMap.length / 2;
+		int halfTileSize = ptrScanMap.length / 2;
 
 		// debug - print out
-		System.out.println("inside of loadMapTileIntoGlobal():");
+		System.out.println("inside of loadMapTileIntoGlobal()[scanLoc="
+				+ scanLoc + "]:" + "[currLoc=" + currentLoc);
+		System.out.println("ptrScanMap Size: " + ptrScanMap.length);
 
 		for (int y = 0; y < ptrScanMap.length; y++) {
 			for (int x = 0; x < ptrScanMap.length; x++) {
 
-				ter = ptrScanMap[y][x].getTerrain();
-				sci = ptrScanMap[y][x].getScience();
-				elev = ptrScanMap[y][x].getElevation();
-				hasR = ptrScanMap[y][x].getHasRover();
+				ter = ptrScanMap[x][y].getTerrain();
+				sci = ptrScanMap[x][y].getScience();
+				elev = ptrScanMap[x][y].getElevation();
+				hasR = ptrScanMap[x][y].getHasRover();
 
 				tempTile = new MapTile(ter, sci, elev, hasR);
-				tempCoord = new Coord(currentLoc.getXpos() - centerIndex + x,
-						currentLoc.getYpos() - centerIndex + y);
+				tempCoord = new Coord((scanLoc.getXpos() - halfTileSize) + x,
+						scanLoc.getYpos() - halfTileSize + y);
 
 				// debug
-				System.out.println("(i,j)=(" + y + "," + x + ")\t" + tempCoord
-						+ tempTile);
+				System.out.println("(x,y)=(" + x + "," + y + ")|" + "(X,Y)=("
+						+ (scanLoc.getXpos() - halfTileSize + x) + ","
+						+ (scanLoc.getYpos() - halfTileSize + y) + ")\t"
+						+ tempCoord + tempTile);
 				mapTileLog.put(tempCoord, tempTile);
 
 				System.out.println(tempCoord + " *** " + tempTile);
+
+				// ----G12 Thanks Wael! Please review and see if it fits -------------------------------
+				if (mapTileLog.get(tempCoord) == null) {
+					mapTileLog
+							.put(tempCoord, new MapTile(ter, sci, elev, hasR));
+
+					// TODO Implementation need testing
+
+					// Create JSON object
+					JSONObject obj = new JSONObject();
+					obj.put("x:", new Integer(scanLoc.getXpos() - halfTileSize + x));
+					obj.put("y:", new Integer(scanLoc.getYpos() - halfTileSize + y));
+
+					// Check if terrain exist
+					if (!ter.getTerString().isEmpty()) {
+						obj.put("terrain:", new String(ter.getTerString()));
+					} else {
+						obj.put("terrain:", new String(""));
+					}
+					// Check if science exist
+					if (!sci.getSciString().isEmpty()) {
+						obj.put("science:", new String(sci.getSciString()));
+						obj.put("stillExists:", new Boolean(true));
+					} else {
+						obj.put("science:", new String(""));
+						obj.put("stillExists:", new Boolean(false));
+					}
+
+					// Send JSON object to server using HTTP POST method
+					sendJSONToServer(obj, "http://localhost:8080/sensor");
+
+					// -----------------------------------
+
+				}
 			}
 		}
+
 	}
 
 	private void move(String dir) throws IOException {
@@ -998,31 +1058,28 @@ public class ROVER_12 {
 		return i >= 0 && j >= 0 && i < arrayLength && j < arrayLength;
 	}
 
-//	private void SendJsonToServer(JSONObject obj) {
-//		 HttpClient client = new DefaultHttpClient();
-//		 HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000);
-//		 //Timeout Limit
-//		 HttpResponse response;
-//		
-//		 try {
-//		 //TODO Update with correct server URL
-//		 HttpPost post = new HttpPost("OUR SERVER URL");
-//		 StringEntity se = new StringEntity(obj.toString());
-//		 se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
-//		 "application/json"));
-//		 post.setEntity(se);
-//		 response = client.execute(post);
-//		
-//		 /*Checking response */
-//		 if(response!=null){
-//		 InputStream in = response.getEntity().getContent(); 
-//		 //Get the data in the entity
-//		 }
-//		
-//		 } catch(Exception e) {
-//		 e.printStackTrace();
-//		 }
-//	}
+	private void sendJSONToServer(JSONObject obj, String URL) {
+		// TODO need testing
+		try {
+			HttpClient client = HttpClientBuilder.create().build();
+			HttpPost post = new HttpPost(URL);
+
+			StringEntity se = new StringEntity(obj.toString());
+			post.setHeader("content-type", "application/json");
+			post.setEntity(se);
+
+			HttpResponse response = client.execute(post);
+
+			// Check response
+
+			System.out.println("Response Code : "
+					+ response.getStatusLine().getStatusCode());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	/**
 	 * Runs the client
