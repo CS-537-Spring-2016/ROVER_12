@@ -610,12 +610,6 @@ public class ROVER_12 {
 
 		System.out.println("+++++++++++++++ jsonScanMapString +++++++++++++++");
 		System.out.println(jsonScanMapString.toString());
-		// try {
-		// Thread.sleep(10000);
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 
 		// System.out.println("ROVER_12 convert from json back to ScanMap class");
 		// convert from the json string back to a ScanMap object
@@ -824,6 +818,7 @@ public class ROVER_12 {
 		}
 	}
 
+
 	public void debugPrintMapTileArray(Map<Coord, MapTile> globalMapCopy) {
 
 		// FIXME
@@ -905,7 +900,10 @@ public class ROVER_12 {
 
 		// debug - print out
 		System.out.println("inside of loadMapTileIntoGlobal()[scanLoc="
-				+ scanLoc + "]:" + "[currLoc=" + currentLoc);
+
+				+ scanLoc + "]:"+"[currLoc="
+				+ currentLoc);
+
 		System.out.println("ptrScanMap Size: " + ptrScanMap.length);
 
 		for (int y = 0; y < ptrScanMap.length; y++) {
@@ -1058,6 +1056,7 @@ public class ROVER_12 {
 		return i >= 0 && j >= 0 && i < arrayLength && j < arrayLength;
 	}
 
+
 	private void sendJSONToServer(JSONObject obj, String URL) {
 		// TODO need testing
 		try {
@@ -1079,7 +1078,9 @@ public class ROVER_12 {
 			e.printStackTrace();
 		}
 
+
 	}
+
 
 	/**
 	 * Runs the client
