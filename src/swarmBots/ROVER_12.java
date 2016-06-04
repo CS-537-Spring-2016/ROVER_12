@@ -66,8 +66,8 @@ public class ROVER_12 {
 	Coord nextTarget;
 
 	// Green Corp variables
-	String url = "http://23.251.155.186:3000/api";
-	String corp_secret = "0FSj7Pn23t";
+	String url = "http://192.168.1.104:3000/api";
+	String corp_secret = "gz5YhL70a2";
 
 	public ROVER_12() {
 		// constructor

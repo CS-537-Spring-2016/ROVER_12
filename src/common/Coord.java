@@ -41,5 +41,13 @@ public class Coord {
 	public Coord clone(){
 		return new Coord(xpos, ypos);
 	}
+
+	public int getXpos() {
+		return this.xpos;
+	}
+
+	public int getYpos() {
+		return this.ypos;
+	}
 	
 }
