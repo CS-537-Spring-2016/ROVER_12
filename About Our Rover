@@ -1,0 +1,38 @@
+Important Notes on our ROVER_12
+-------------------------------
+
+Functionality
+1.Range Extender - 11 X 11
+2.SPECTRAL_SENSOR - to collect the science
+
+        Spectral sensor VS science
+        --------------------------
+        TYPE OF SCIENCE         COLOR           COLLECT
+        Crystal Science         Yellow          Gather
+        others                  blue,Red....    Dont Gather
+        
+3.Wheels 
+        Wheels can move over terrain the fastest of any drive system.
+        Wheels can travel over Soil and Gravel.
+        Wheels cannot travel into or through Rock terrain
+        Wheels will immediately get stuck upon entering Sand terrain.
+
+        Wheels vs Terrain
+        ----------------------
+        TYPE OF TERRAIN,      COLOR            ABILITY TO CRAWL        Avoidance Method
+        soil    	            white                   yes               not applicable      		
+        gravel  	            light gravy             yes               not applicable
+        none    	            black                   no                applicable
+        sand    	            orange          	      no                applicable
+        rock    	            blue            	      no                applicable
+        
+        
+        
+        
+Implementation
+--------------
+1.Wall Follower Algorithm and Our Motion Logic to Crawl through the Map
+(Two algorithm switches whenever neeeded to discover large area)
+2.Implemeted Communication with Green Corp Server
+
+

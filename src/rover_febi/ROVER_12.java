@@ -384,6 +384,7 @@ public class ROVER_12 {
 
 	private boolean[] randomPickMotion(boolean[] cardinals, int centerIndex,
 			MapTile[][] scanMapTiles) {
+		
 		int randomNumber = randomNum(0, 3);
 
 		if (cardinals[randomNumber] == true) {
